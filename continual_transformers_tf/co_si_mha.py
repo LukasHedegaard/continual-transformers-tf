@@ -244,6 +244,7 @@ class CoSiMultiHeadAttention(WithCallMode, MultiHeadAttention):
         training=None,
         **kwargs,
     ):
+        query = tf.expand_dims(query[:, -1], 1)
         return MultiHeadAttention.call(
             self,
             query,

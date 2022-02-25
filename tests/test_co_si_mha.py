@@ -52,7 +52,7 @@ def test_multi_head_attention():
 
     # Regular call is unchanged
     a2 = comha(query, value, key)
-    tf.debugging.assert_equal(a1, a2)
+    tf.debugging.assert_near(a1[:, -1:], a2)
 
     # Continual calls arrive at same result
     # for i in range(L - 1):
