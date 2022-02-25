@@ -10,7 +10,7 @@ class CircularPositionalEncoding(WithCallMode, Layer):
         max_len: int,
         embed_dim: int,
         call_update_index_steps=1,  # Number of steps that a call updates index
-        temporal_dim=-1,
+        temporal_dim=1,
         call_mode="regular",
     ):
         Layer.__init__(self)

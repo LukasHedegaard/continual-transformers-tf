@@ -9,7 +9,7 @@ class CoDelay(WithCallMode, Layer):
         self,
         delay: int,
         dtype=tf.float32,
-        temporal_dim=-1,
+        temporal_dim=1,
         call_mode="regular",
     ):
         Layer.__init__(self)
