@@ -6,6 +6,11 @@ from .common import WithCallMode, enqueue_and_peek_all
 
 class CoSiMultiHeadAttention(WithCallMode, MultiHeadAttention):
     """Continual Single-output MultiHeadAttention layer from http://arxiv.org/abs/2201.06268
+    The computes identical results to the temporally newest value of the regular MultiHeadAttention.
+    The layer expects inputs of shape:
+    - call_regular: (B, T, ...)
+    - call_steps: (B, T, ...)
+    - call_step: (B, ...)
 
     Args:
       capacity: Sequence length
@@ -212,13 +217,15 @@ class CoSiMultiHeadAttention(WithCallMode, MultiHeadAttention):
         training=None,
         **kwargs,
     ):
-        assert query.shape[1] == value.shape[1] and query.shape[1] == key.shape[1]
+        assert query.shape[1] == value.shape[1] and (
+            key is None or query.shape[1] == key.shape[1]
+        )
         outs, scores = [], []
         for i in range(query.shape[1]):
             o = self.call_step(
                 query[:, i],
                 value[:, i],
-                key[:, i] if key is not None else key,
+                key[:, i] if key is not None else None,
                 attention_mask,
                 return_attention_scores,
                 training,
@@ -229,6 +236,9 @@ class CoSiMultiHeadAttention(WithCallMode, MultiHeadAttention):
                     scores.append(s)
             if o is not None:
                 outs.append(o)
+
+        if len(outs) == 0:
+            return None
 
         if return_attention_scores:
             return tf.stack(outs, axis=1), tf.stack(scores, axis=2)
