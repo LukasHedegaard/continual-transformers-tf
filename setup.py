@@ -29,7 +29,7 @@ def long_description():
 
 setup(
     name="continual-transformers-tf",
-    version="0.1.0",
+    version="0.2.0",
     description="Continual Transformers in TensorFlow",
     author="Lukas Hedegaard",
     author_email="lukasxhedegaard@gmail.com",

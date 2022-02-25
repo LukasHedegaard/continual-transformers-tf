@@ -1,16 +1,8 @@
-from enum import Enum
-
 import tensorflow.compat.v2 as tf
 from keras.layers import MultiHeadAttention
 from tensorflow.python.util.tf_export import keras_export
 
-# pylint: disable=g-classes-have-attributes
-
-
-class CallMode(Enum):
-    REGULAR = "regular"
-    STEPS = "steps"
-    STEP = "step"
+from .common import CallMode
 
 
 def enqueue_and_peek_all(queue: tf.queue.FIFOQueue, val: tf.Tensor, capacity: int):

@@ -29,18 +29,17 @@ The layers are modelled on the `tf.keras.layers.MultiHeadAttention` and should w
 
 ## Setup
 Continual Transformers and its modules can be installed in in your project using:
-```setup
+```bash
 pip install git+https://github.com/LukasHedegaard/continual-transformers-tf.git
 ```
 
 ## Layers
-### Continual Single-output Multi Head Attention
+### [Continual Single-output Multi Head Attention](tests/test_co_si_mha.py)
 ```python
 from continual_transformers_tf import CoSiMultiHeadAttention
 
-net = CoSiMultiHeadAttention(seq_len=10, num_heads=2, key_dim=4)
+layer = CoSiMultiHeadAttention(seq_len=10, num_heads=2, key_dim=4)
 ```
-See [tests](tests/test_co_si_mha.py) for usage examples .
 
 <div align="center">
   <img src="figures/CoSiDotProductAttention.png" width="500">
@@ -63,3 +62,20 @@ See [tests](tests/test_co_si_mha.py) for usage examples .
   </div>
   <br>
 </div> -->
+
+### [Circular Positional Embedding](tests/test_circular_embedding.py)
+```python
+from continual_transformers_tf import CircularPositionalEncoding
+
+cpe = CircularPositionalEncoding(max_len=10, embed_dim=4)
+```
+
+<div align="center">
+  <img src="figures/CircularPositionalEncoding.png" width="500">
+  <br>
+  <div align="left">
+  Fig. 2: Circular Positional Encoding.
+        At each step, a positional encoding is added in a round-robin fashion.
+  </div>
+  <br>
+</div>
