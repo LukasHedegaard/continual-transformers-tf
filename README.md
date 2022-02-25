@@ -23,7 +23,7 @@
   </a>
 </div>
 
-TensorFlow implementation of Continual Transformer building blocks, which augment regular transformer layers with the ability to update the attention output _per token step_.
+TensorFlow implementation of Continual Transformer building blocks, which augment regular transformer layers with the ability to compute the attention output _per token step_.
 
 The layers are modelled on the `tf.keras.layers.MultiHeadAttention` and should work as drop-in replacements in most cases.
 
@@ -67,7 +67,7 @@ layer = CoSiMultiHeadAttention(seq_len=10, num_heads=2, key_dim=4)
 ```python
 from continual_transformers_tf import CircularPositionalEncoding
 
-cpe = CircularPositionalEncoding(max_len=10, embed_dim=4)
+layer = CircularPositionalEncoding(max_len=10, embed_dim=4)
 ```
 
 <div align="center">
@@ -79,3 +79,16 @@ cpe = CircularPositionalEncoding(max_len=10, embed_dim=4)
   </div>
   <br>
 </div>
+
+### [Continual Single-output Transformer Encoder](tests/test_co_si_trans_enc.py)
+```python
+from continual_transformers_tf import CoSiTransformerEncoder
+
+layer = CoSiTransformerEncoder(
+    seq_len=10,
+    embed_dim=4,
+    num_heads=2,
+    ff_dim=16,
+    dropout_rate=0.1,
+)
+```
