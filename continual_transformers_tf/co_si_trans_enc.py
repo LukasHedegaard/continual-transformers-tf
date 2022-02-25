@@ -41,6 +41,9 @@ class CoSiTransformerEncoder(WithCallMode, Layer):
         self._seq_len = seq_len
         self.call_mode = call_mode
 
+    def clean_state(self):
+        self.att.clean_state()
+
     def call_regular(self, inputs, training):
         sel = tf.gather(inputs, indices=[self._seq_len - 1], axis=self._temporal_dim)
         attn_output = self.att.call_regular(inputs, inputs)
