@@ -92,3 +92,13 @@ layer = CoSiTransformerEncoder(
     dropout_rate=0.1,
 )
 ```
+
+## Citation   
+```
+@article{hedegaard2022cotrans,
+  title={Continual Transformers: Redundancy-Free Attention for Online Inference},
+  author={Lukas Hedegaard and Alexandros Iosifidis},
+  journal={preprint, arXiv:2201.06268},
+  year={2022}
+}
+```
