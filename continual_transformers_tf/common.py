@@ -21,15 +21,15 @@ class WithCallMode(abc.ABC):
 
     @abc.abstractmethod
     def call_regular(self, *args, **kwargs):
-        pass
+        pass  # pragma: no cover
 
     @abc.abstractmethod
     def call_step(self, *args, **kwargs):
-        pass
+        pass  # pragma: no cover
 
     @abc.abstractmethod
     def call_steps(self, *args, **kwargs):
-        pass
+        pass  # pragma: no cover
 
     def call(self, *args, **kwargs):
         call_fn = {
