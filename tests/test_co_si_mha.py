@@ -4,7 +4,7 @@ from tensorflow.keras.layers import MultiHeadAttention
 from continual_transformers_tf import CoSiMultiHeadAttention
 
 
-def test_multi_head_attention():
+def test_co_si_mha():
     B = 2  # batch size
     L = 10  # target sequence length
     K = 6  # key dimension
