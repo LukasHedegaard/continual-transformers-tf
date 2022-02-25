@@ -10,7 +10,7 @@ class CallMode(Enum):
     STEP = "step"
 
 
-class WithCallMode:
+class WithCallMode(abc.ABC):
     @property
     def call_mode(self) -> CallMode:
         return self._call_mode
