@@ -1,10 +1,10 @@
-import tensorflow as tf
-from tensorflow.keras.layers import Embedding, Layer
+import tensorflow.compat.v2 as tf
+from tensorflow.compat.v2.keras.layers import Embedding, Layer
 
-from .common import CallMode
+from .common import WithCallMode
 
 
-class CircularPositionalEncoding(Layer):
+class CircularPositionalEncoding(WithCallMode, Layer):
     def __init__(
         self,
         max_len: int,
@@ -13,23 +13,17 @@ class CircularPositionalEncoding(Layer):
         temporal_dim=-1,
         call_mode="regular",
     ):
-        super(CircularPositionalEncoding, self).__init__()
+        Layer.__init__(self)
         self._max_len = max_len
         self._pos_emb = Embedding(input_dim=max_len, output_dim=embed_dim)
         self._index = tf.Variable(0, trainable=False, name="pos_index")
         self._call_update_index_steps = tf.constant(call_update_index_steps)
         self._temporal_dim = temporal_dim
-        self._call_mode = CallMode(call_mode)
+        self.call_mode = call_mode
 
-    @property
-    def call_mode(self) -> CallMode:
-        return self._call_mode
-
-    @call_mode.setter
-    def call_mode(self, value):
-        self._call_mode = CallMode(value)
-
-    def call_regular(self, x: tf.Tensor, update_index_steps: int = None) -> tf.Tensor:
+    def call_regular(
+        self, x: tf.Tensor, update_index_steps: int = None, **kwargs
+    ) -> tf.Tensor:
         rank = tf.rank(x)
         t_dim = (self._temporal_dim + rank) % rank
         L = tf.shape(x)[t_dim]
@@ -52,18 +46,18 @@ class CircularPositionalEncoding(Layer):
 
         return x + pos_embs
 
-    def call_step(self, x: tf.Tensor) -> tf.Tensor:
+    def call_step(self, x: tf.Tensor, **kwargs) -> tf.Tensor:
         output = x + self._pos_emb((self._index))
         self._index.assign(tf.math.floormod((self._index + 1), self._max_len))
         return output
 
-    def call_steps(self, x: tf.Tensor) -> tf.Tensor:
+    def call_steps(self, x: tf.Tensor, **kwargs) -> tf.Tensor:
         return self.call_regular(x, update_index_steps=tf.shape(x)[self._temporal_dim])
 
-    def call(self, x: tf.Tensor) -> tf.Tensor:
-        call_fn = {
-            "regular": self.call_regular,
-            "step": self.call_step,
-            "steps": self.call_steps,
-        }[self.call_mode.value]
-        return call_fn(x)
+    # def call(self, x: tf.Tensor) -> tf.Tensor:
+    #     call_fn = {
+    #         "regular": self.call_regular,
+    #         "step": self.call_step,
+    #         "steps": self.call_steps,
+    #     }[self.call_mode.value]
+    #     return call_fn(x)

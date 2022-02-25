@@ -1,23 +1,10 @@
 import tensorflow.compat.v2 as tf
 from keras.layers import MultiHeadAttention
-from tensorflow.python.util.tf_export import keras_export
 
-from .common import CallMode
-
-
-def enqueue_and_peek_all(queue: tf.queue.FIFOQueue, val: tf.Tensor, capacity: int):
-    queue.dequeue()
-    queue.enqueue(val)
-    # Currently, there is no peek operation in tf queues.
-    # Unfortunately, this necessitates a full dequeue and encueue.
-    vals = queue.dequeue_many(capacity)
-    queue.enqueue_many(vals)
-    # [L, B, ...] -> [B, L, ...]
-    return tf.experimental.numpy.swapaxes(vals, 0, 1)
+from .common import WithCallMode, enqueue_and_peek_all
 
 
-@keras_export("keras.layers.CoSiMultiHeadAttention")
-class CoSiMultiHeadAttention(MultiHeadAttention):
+class CoSiMultiHeadAttention(WithCallMode, MultiHeadAttention):
     """Continual Single-output MultiHeadAttention layer from http://arxiv.org/abs/2201.06268
 
     Args:
@@ -84,7 +71,7 @@ class CoSiMultiHeadAttention(MultiHeadAttention):
         kernel_constraint=None,
         bias_constraint=None,
         call_mode="regular",
-        **kwargs
+        **kwargs,
     ):
         MultiHeadAttention.__init__(
             self,
@@ -102,18 +89,10 @@ class CoSiMultiHeadAttention(MultiHeadAttention):
             activity_regularizer,
             kernel_constraint,
             bias_constraint,
-            **kwargs
+            **kwargs,
         )
         self._seq_len = seq_len
-        self._call_mode = CallMode(call_mode)
-
-    @property
-    def call_mode(self) -> CallMode:
-        return self._call_mode
-
-    @call_mode.setter
-    def call_mode(self, value):
-        self._call_mode = CallMode(value)
+        self.call_mode = call_mode
 
     def _build_from_signature(self, query, value, key=None, dtype=tf.float32):
         """Builds layers and variables.
@@ -174,6 +153,7 @@ class CoSiMultiHeadAttention(MultiHeadAttention):
         attention_mask=None,
         return_attention_scores=False,
         training=None,
+        **kwargs,
     ):
         if not self._built_from_signature:
 
@@ -230,6 +210,7 @@ class CoSiMultiHeadAttention(MultiHeadAttention):
         attention_mask=None,
         return_attention_scores=False,
         training=None,
+        **kwargs,
     ):
         assert query.shape[1] == value.shape[1] and query.shape[1] == key.shape[1]
         outs, scores = [], []
@@ -261,6 +242,7 @@ class CoSiMultiHeadAttention(MultiHeadAttention):
         attention_mask=None,
         return_attention_scores=False,
         training=None,
+        **kwargs,
     ):
         return MultiHeadAttention.call(
             self,
@@ -270,22 +252,4 @@ class CoSiMultiHeadAttention(MultiHeadAttention):
             attention_mask,
             return_attention_scores,
             training,
-        )
-
-    def call(
-        self,
-        query,
-        value,
-        key=None,
-        attention_mask=None,
-        return_attention_scores=False,
-        training=None,
-    ):
-        call_fn = {
-            "regular": CoSiMultiHeadAttention.call_regular,
-            "step": CoSiMultiHeadAttention.call_step,
-            "steps": CoSiMultiHeadAttention.call_steps,
-        }[self.call_mode.value]
-        return call_fn(
-            self, query, value, key, attention_mask, return_attention_scores, training
         )
